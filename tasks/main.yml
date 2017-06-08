@@ -1,31 +1,38 @@
 ---
-# tasks file for openio-sds
-- name: Set Zookeeper Id
-  tags:
-    - install
-  set_fact:
-    zk_id: " {{ item.0 + 1 }}"
-  with_indexed_items: "{{ cluster_ip }}"
-  when: item.1 == "{{ ansible_default_ipv4['address'] }}"
+- name: Check if OS is supported for OpenIO SDS installation
+  fail:
+    msg: "{{ ansible_os_family }} operating system not supported."
+  when: ansible_os_family != 'Debian'
+        and ansible_os_family != 'Ubuntu'
+        and ansible_os_family != 'RedHat'
+        and ansible_os_family != 'Raspbian'
 
-- name: Generate a puppet manifest
+- name: Generate a Puppet manifest for namespace {{ namespace }}
   tags:
     - install
   template:
     src: openio.pp.j2
-    dest: /root/openio.pp
+    dest: "{{ openio_puppet_manifest }}/{{ namespace|lower }}.pp"
     owner: root
     group: root
     mode: 0644
 
-- name: Add repository OpenIO
+- name: "Configure repositories for {{ ansible_os_family }}"
   tags:
     - install
-  include : "{{ ansible_os_family }}.yml"
+  include : "{{ ansible_os_family }}.yml"
+  when: ( ansible_os_family == 'Debian' and not ansible_architecture.lower().startswith('arm') )
+        or ansible_os_family == 'Ubuntu' or ansible_os_family == 'RedHat' or ansible_os_family == 'Raspbian'
 
-- name: Initializing the openio cluster
+- name: "Configure repositories for Raspbian"
   tags:
-    - configure
-  include: initialize.yml
+    - install
+  include : Raspbian.yml
+  when: ansible_os_family == 'Debian' and ansible_architecture.lower().startswith('arm')
+
+- name: Bootstrapping OpenIO for namespace {{ namespace }}
+  tags:
+    - openio_bootstrap
+  include: bootstrap.yml
   when: 
-    - configure == true
+    - openio_bootstrap == true

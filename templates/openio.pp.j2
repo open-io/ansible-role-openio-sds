@@ -1,77 +1,90 @@
 class {'openiosds':}
+openiosds::namespace {'{{ namespace }}':
+  ns             => '{{ namespace }}',
+  conscience_url => "{{ conscience_ip }}:6000",
+  zookeeper_url  => "{% for ip in openio_zk_cluster_ip %}{{ ip }}:6005{% if not loop.last %},{% endif %}{% endfor %}",
+  oioproxy_url   => "${ipaddress}:6006",
+  eventagent_url => "beanstalk://${ipaddress}:6014",
+  meta1_digits   => 1,
+}
+openiosds::oioproxy {'oioproxy-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+openiosds::conscienceagent {'conscienceagent-0':
+  ns => '{{ namespace }}',
+}
+openiosds::oioeventagent {'oio-event-agent-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+openiosds::beanstalkd {'beanstalkd-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+openiosds::meta2 {'meta2-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+### RAW-X
+openiosds::rawx {'rawx-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+openiosds::rdir {'rdir-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+openiosds::oioblobindexer {'oio-blob-indexer-rawx-0':
+  ns  => '{{ namespace }}',
+}
+{% if ansible_host in openio_directory_ip or ansible_default_ipv4.address in openio_directory_ip %}
+### Directory
+openiosds::meta0 {'meta0-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+openiosds::meta1 {'meta1-0':
+  ns        => '{{ namespace }}',
+  ipaddress => $ipaddress,
+}
+{% endif %}
+{% if ansible_host == conscience_ip or ansible_default_ipv4.address == conscience_ip %}
+### Conscience
 openiosds::conscience {'conscience-0':
-  ns                    => 'OPENIO',
+  ns                    => '{{ namespace }}',
   ipaddress             => $ipaddress,
   service_update_policy => {'meta2'=>'KEEP|3|1|','sqlx'=>'KEEP|3|1|','rdir'=>'KEEP|1|1|user_is_a_service=rawx'},
   storage_policy        => 'THREECOPIES',
 }
-openiosds::namespace {'OPENIO':
-  ns             => 'OPENIO',
-
-  conscience_url => "{{ conscience_ip }}:6000",
-  zookeeper_url  => "{% for ip in cluster_ip %}{{ ip }}:6005{% if not loop.last %},{% endif %}{% endfor %}",
-  oioproxy_url   => "${ipaddress}:6006",
-  eventagent_url => "beanstalk://${ipaddress}:6014",
-}
+{% endif %}
+{% if ansible_host in openio_redis_cluster_ip or ansible_default_ipv4.address in openio_redis_cluster_ip %}
+### Account
 openiosds::account {'account-0':
-  ns                    => 'OPENIO',
-  ipaddress             => $ipaddress,
-  sentinel_hosts        => '{% for ip  in cluster_ip %}{{ ip }}:6012{% if not loop.last %},{% endif %}{% endfor %}',
-  sentinel_master_name  => 'OPENIO-master-1',
+  ns                   => '{{ namespace }}',
+  ipaddress            => $ipaddress,
+  sentinel_hosts       => '{% for ip  in openio_redis_cluster_ip %}{{ ip }}:6012{% if not loop.last %},{% endif %}{% endfor %}',
+  sentinel_master_name => '{{ namespace }}-master-1',
 }
-openiosds::meta0 {'meta0-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-}
-openiosds::meta1 {'meta1-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-}
-openiosds::meta2 {'meta2-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-}
-openiosds::rawx {'rawx-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-}
-openiosds::oioeventagent {'oio-event-agent-0':
-  ns          => 'OPENIO',
-  ipaddress   => $ipaddress,
-}
-openiosds::oioproxy {'oioproxy-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-}
-openiosds::zookeeper {'zookeeper-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-  servers   => [{% for ip in cluster_ip %}'{{ ip }}:2888:3888'{% if not loop.last %},{% endif %}{% endfor %}],
-  myid      => {{ zk_id }},
-}
+### Redis
 openiosds::redissentinel {'redissentinel-0':
-  ns        => 'OPENIO',
-  master_name => 'OPENIO-master-1',
-  redis_host => "{{ redis_ip }}",
+  ns          => '{{ namespace }}',
+  master_name => '{{ namespace }}-master-1',
+  redis_host  => "{{ ansible_default_ipv4.address }}",
 }
 openiosds::redis {'redis-0':
-  ns        => 'OPENIO',
+  ns        => '{{ namespace }}',
   ipaddress => $ipaddress,
-{% if ansible_host != redis_ip %}
-  slaveof => '{{ redis_ip }} 6011',
+{% if ansible_host != openio_redis_cluster_ip[0] and ansible_default_ipv4.address != openio_redis_cluster_ip[0] %}
+  slaveof   => '{{ openio_redis_cluster_ip[0] }} 6011',
 {% endif %}
 }
-openiosds::conscienceagent {'conscienceagent-0':
-  ns  => 'OPENIO',
-}
-openiosds::beanstalkd {'beanstalkd-0':
-  ns        => 'OPENIO',
+{% endif %}
+{% if ansible_host in openio_zk_cluster_ip or ansible_default_ipv4.address in openio_zk_cluster_ip %}
+###  ZooKeeper
+openiosds::zookeeper {'zookeeper-0':
+  ns        => '{{ namespace }}',
   ipaddress => $ipaddress,
+  servers   => [{% for ip in openio_zk_cluster_ip %}'{{ ip }}:2888:3888'{% if not loop.last %},{% endif %}{% endfor %}],
 }
-openiosds::rdir {'rdir-0':
-  ns        => 'OPENIO',
-  ipaddress => $ipaddress,
-}
-openiosds::oioblobindexer {'oio-blob-indexer-rawx-0':
-  ns  => 'OPENIO',
-}
+{% endif %}
