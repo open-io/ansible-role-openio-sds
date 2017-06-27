@@ -1,0 +1,14 @@
+# roles/openio-sds/tasks/sysctl.yml
+---
+- name: 'OpenIO SDS: Set sysctl parameters'
+  sysctl:
+    sysctl_file: "{{ openio_sds_sysctl_template_dest }}"
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    reload: yes
+  tags: install
+  with_dict: "{{ openio_sds_sysctl_entries }}"
+  when: openio_sds_sysctl_managed
+        and ansible_virtualization_type != 'docker'
+...
