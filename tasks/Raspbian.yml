@@ -1,0 +1,30 @@
+---
+- name: "Debian| add Backports repository"
+  apt_repository:
+    repo: "deb http://httpredir.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free"
+    state: present
+    filename: "{{ ansible_distribution_release }}-backports"
+
+- name: Raspbian| add OpenIO repository
+  apt_repository:
+    repo: "deb {{ sds_openio_repo }}/raspbian/ {{ ansible_distribution_release }}/"
+    state: present
+    filename: 'openio-sds'
+
+- name : Raspbian| add OpenIO repo key
+  apt_key:
+    url: "http://mirror.openio.io/pub/repo/openio/APT-GPG-KEY-OPENIO-0"
+    keyring: /etc/apt/trusted.gpg.d/openio.gpg  
+
+- name: Raspbian| Install rsyslog from {{ ansible_distribution_release }} repository
+  apt:
+    name: rsyslog
+    state: latest
+    default_release: "{{ ansible_distribution_release }}"
+    update_cache: yes
+
+- name : Raspbian| Install OpenIO puppet module
+  apt:
+    name: puppet-module-openio-openiosds
+    update_cache: yes
+...
