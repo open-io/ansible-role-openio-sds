@@ -1,38 +1,41 @@
 ---
 - name: Check if OS is supported for OpenIO SDS installation
   fail:
-    msg: "{{ ansible_os_family }} operating system not supported."
-  when: ansible_os_family != 'Debian'
-        and ansible_os_family != 'Ubuntu'
-        and ansible_os_family != 'RedHat'
-        and ansible_os_family != 'Raspbian'
+    msg: "{{ ansible_distribution }} operating system not supported."
+  when: ansible_distribution != 'Debian'
+        and ansible_distribution != 'Ubuntu'
+        and ansible_distribution != 'RedHat'
+        and ansible_distribution != 'Raspbian'
+        and ansible_distribution != 'CentOS'
 
-- name: Generate a Puppet manifest for namespace {{ namespace }}
+# - include: sysctl.yml
+
+- name: "Generate a Puppet manifest for namespace {{ openio_namespace }}"
   tags:
     - install
   template:
     src: openio.pp.j2
-    dest: "{{ openio_puppet_manifest }}/{{ namespace|lower }}.pp"
+    dest: "{{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
     owner: root
     group: root
     mode: 0644
+#
+# - name: "Configure repositories for {{ ansible_os_family }}"
+#   tags:
+#     - install
+#   include : "{{ ansible_os_family }}.yml"
+#   when: ( ansible_os_family == 'Debian' and not ansible_architecture.lower().startswith('arm') )
+#         or ansible_os_family == 'Ubuntu' or ansible_os_family == 'RedHat' or ansible_os_family == 'Raspbian'
+#
+# - name: "Configure repositories for Raspbian"
+#   tags:
+#     - install
+#   include : Raspbian.yml
+#   when: ansible_os_family == 'Debian' and ansible_architecture.lower().startswith('arm')
 
-- name: "Configure repositories for {{ ansible_os_family }}"
-  tags:
-    - install
-  include : "{{ ansible_os_family }}.yml"
-  when: ( ansible_os_family == 'Debian' and not ansible_architecture.lower().startswith('arm') )
-        or ansible_os_family == 'Ubuntu' or ansible_os_family == 'RedHat' or ansible_os_family == 'Raspbian'
-
-- name: "Configure repositories for Raspbian"
-  tags:
-    - install
-  include : Raspbian.yml
-  when: ansible_os_family == 'Debian' and ansible_architecture.lower().startswith('arm')
-
-- name: Bootstrapping OpenIO for namespace {{ namespace }}
+- name: "Bootstrapping OpenIO for namespace {{ openio_namespace }}"
   tags:
     - openio_bootstrap
   include: bootstrap.yml
-  when: 
+  when:
     - openio_bootstrap == true
