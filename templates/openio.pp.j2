@@ -1,90 +1,160 @@
 class {'openiosds':}
-openiosds::namespace {'{{ namespace }}':
-  ns             => '{{ namespace }}',
+openiosds::namespace {'{{ openio_namespace }}':
+  ns             => '{{ openio_namespace }}',
   conscience_url => "{{ conscience_ip }}:6000",
   zookeeper_url  => "{% for ip in openio_zk_cluster_ip %}{{ ip }}:6005{% if not loop.last %},{% endif %}{% endfor %}",
-  oioproxy_url   => "${ipaddress}:6006",
-  eventagent_url => "beanstalk://${ipaddress}:6014",
-  meta1_digits   => 1,
+  oioproxy_url   => "{{ openio_network_private_ipaddress }}:6006",
+  eventagent_url => "beanstalk://{{ openio_network_private_ipaddress }}:6014",
+  meta1_digits   => {{ openio_meta1_digits }},
 }
-openiosds::oioproxy {'oioproxy-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
+openiosds::oioproxy {'oioproxy-1':
+  num       => 1,
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
 }
-openiosds::conscienceagent {'conscienceagent-0':
-  ns => '{{ namespace }}',
+openiosds::conscienceagent {'conscienceagent-1':
+  num => 1,
+  ns  => '{{ openio_namespace }}',
 }
-openiosds::oioeventagent {'oio-event-agent-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
+openiosds::oioeventagent {'oio-event-agent-1':
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
 }
-openiosds::beanstalkd {'beanstalkd-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
+{# Loop over openio_metadata_mounts for metadata services #}
+{% for partition in openio_metadata_mounts %}
+  {%- if loop.index == 1 %}
+openiosds::beanstalkd {'beanstalkd-1':
+  num       => 1,
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  binlogdir => "{{ partition.mountpoint }}/beanstalkd-1",
 }
-openiosds::meta2 {'meta2-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
-}
-### RAW-X
-openiosds::rawx {'rawx-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
-}
-openiosds::rdir {'rdir-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
-}
-openiosds::oioblobindexer {'oio-blob-indexer-rawx-0':
-  ns  => '{{ namespace }}',
-}
-{% if ansible_host in openio_directory_ip or ansible_default_ipv4.address in openio_directory_ip %}
+  {%- endif %}
+  {%- if 'openio_directory_m0' in group_names and loop.index == 1 %}
+
 ### Directory
-openiosds::meta0 {'meta0-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
+openiosds::meta0 {'meta0-1':
+  num       => 1,
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  volume    => "{{ partition.mountpoint }}/meta0-1",
 }
-openiosds::meta1 {'meta1-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
+    {%- endif %}
+  {%- if 'openio_directory_m1' in group_names %}
+
+openiosds::meta1 {'meta1-{{ loop.index }}':
+  num       => {{ loop.index }},
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  port      => {{ 6110 + loop.index }},
+  volume    => "{{ partition.mountpoint }}/meta1-{{ loop.index }}",
 }
-{% endif %}
-{% if ansible_host == conscience_ip or ansible_default_ipv4.address == conscience_ip %}
-### Conscience
-openiosds::conscience {'conscience-0':
-  ns                    => '{{ namespace }}',
-  ipaddress             => $ipaddress,
-  service_update_policy => {'meta2'=>'KEEP|3|1|','sqlx'=>'KEEP|3|1|','rdir'=>'KEEP|1|1|user_is_a_service=rawx'},
-  storage_policy        => 'THREECOPIES',
+  {%- endif %}
+
+openiosds::meta2 {'meta2-{{ loop.index }}':
+  num       => {{ loop.index }},
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  port      => {{ 6120 + loop.index }},
+  volume    => "{{ partition.mountpoint }}/meta2-{{ loop.index }}",
 }
-{% endif %}
-{% if ansible_host in openio_redis_cluster_ip or ansible_default_ipv4.address in openio_redis_cluster_ip %}
+  {%- if 'openio_zk_cluster' in group_names and loop.index == 1 %}
+
+###  ZooKeeper
+openiosds::zookeeper {'zookeeper-1':
+  num       => 1,
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  servers   => [{% for ip in openio_zk_cluster_ip %}'{{ ip }}:2888:3888'{% if not loop.last %},{% endif %}{% endfor %}],
+  dataDir   => "{{ partition.mountpoint }}/zookeeper-1",
+}
+  {%- endif %}
+  {%- if 'openio_redis_cluster' in group_names and loop.index == 1 %}
+
 ### Account
-openiosds::account {'account-0':
-  ns                   => '{{ namespace }}',
-  ipaddress            => $ipaddress,
+openiosds::account {'account-1':
+  num                  => 1,
+  ns                   => '{{ openio_namespace }}',
+  ipaddress            => "{{ openio_network_private_ipaddress }}",
   sentinel_hosts       => '{% for ip  in openio_redis_cluster_ip %}{{ ip }}:6012{% if not loop.last %},{% endif %}{% endfor %}',
-  sentinel_master_name => '{{ namespace }}-master-1',
+  sentinel_master_name => '{{ openio_namespace }}-master-1',
 }
 ### Redis
-openiosds::redissentinel {'redissentinel-0':
-  ns          => '{{ namespace }}',
-  master_name => '{{ namespace }}-master-1',
-  redis_host  => "{{ ansible_default_ipv4.address }}",
+openiosds::redissentinel {'redissentinel-1':
+  num         => 1,
+  ns          => '{{ openio_namespace }}',
+  ipaddress   => "{{ openio_network_private_ipaddress }}",
+  master_name => '{{ openio_namespace }}-master-1',
+  redis_host  => "{{ openio_network_private_ipaddress }}",
 }
-openiosds::redis {'redis-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
-{% if ansible_host != openio_redis_cluster_ip[0] and ansible_default_ipv4.address != openio_redis_cluster_ip[0] %}
+openiosds::redis {'redis-1':
+  num       => 1,
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  {%- if openio_network_private_ipaddress != openio_redis_cluster_ip[0] %}
+
   slaveof   => '{{ openio_redis_cluster_ip[0] }} 6011',
-{% endif %}
+  {%- endif %}
+
 }
-{% endif %}
-{% if ansible_host in openio_zk_cluster_ip or ansible_default_ipv4.address in openio_zk_cluster_ip %}
-###  ZooKeeper
-openiosds::zookeeper {'zookeeper-0':
-  ns        => '{{ namespace }}',
-  ipaddress => $ipaddress,
-  servers   => [{% for ip in openio_zk_cluster_ip %}'{{ ip }}:2888:3888'{% if not loop.last %},{% endif %}{% endfor %}],
+  {%- endif %}
+{%- endfor %}
+{# end loop #}
+{# Loop over openio_data_mounts for data services #}
+{%- for partition in openio_data_mounts %}
+
+### Data services {{ loop.index }}
+openiosds::rawx {'rawx-{{ loop.index }}':
+  num          => {{ loop.index }},
+  ns           => '{{ openio_namespace }}',
+  ipaddress    => "{{ openio_network_private_ipaddress }}",
+  port         => {{ 6200 + loop.index }},
+  documentRoot => "{{ partition.mountpoint }}/rawx-{{ loop.index }}",
 }
-{% endif %}
+openiosds::rdir {'rdir-{{ loop.index }}':
+  num       => {{ loop.index }},
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+  port      => {{ 6300 + loop.index }},
+  db_path   => "{{ partition.mountpoint }}/rdir-{{ loop.index }}",
+}
+openiosds::oioblobindexer {'oio-blob-indexer-rawx-{{ loop.index }}':
+  num    => {{ loop.index }},
+  ns     => '{{ openio_namespace }}',
+  volume => "{{ partition.mountpoint }}/rawx-{{ loop.index }}",
+}
+{%- endfor %}
+{# end loop #}
+{%- if 'openio_conscience' in group_names %}
+
+### Conscience
+openiosds::conscience {'conscience-1':
+  num                   => 1,
+  ns                    => '{{ openio_namespace }}',
+  ipaddress             => "{{ openio_network_private_ipaddress }}",
+  service_update_policy => {{ openio_service_update_policy }},
+  storage_policy        => '{{ openio_storage_policy }}',
+}
+{%- endif %}
+{%- if 'openio_swift' in group_names %}
+
+openiosds::oioswift {'oioswift-1':
+  num              => 1,
+  ns               => '{{ openio_namespace }}',
+  ipaddress        => "{{ openio_network_public_ipaddress }}",
+  sds_proxy_url    => "http://{{ openio_network_private_ipaddress }}:6006",
+  auth_system      => '{{ openio_swift_auth_system }}',
+  {%- if openio_swift_tempauth_users %}
+
+  tempauth_users   => {{ openio_swift_tempauth_users }},
+  {%- endif %}
+
+  memcache_servers => "{{ openio_network_private_ipaddress }}:6019",
+  memcache_max_connections => 500,
+}
+openiosds::memcached {'memcached-1':
+  num       => 1,
+  ns        => '{{ openio_namespace }}',
+  ipaddress => "{{ openio_network_private_ipaddress }}",
+}
+{%- endif %}
