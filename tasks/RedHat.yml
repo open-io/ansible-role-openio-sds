@@ -1,9 +1,4 @@
 ---
-- name: RedHat| add repository OpenIO
-  yum:
-    name: "{{ sds_openio_repo }}/el/openio-sds-release-{{ sds_version }}-1.el.noarch.rpm"
-    state: present
-
 - name : RedHat| Install OpenIO puppet module
   yum:
     name: puppet-openio-sds.noarch
