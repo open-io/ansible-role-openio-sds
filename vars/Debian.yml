@@ -1,0 +1,5 @@
+---
+
+openio_zookeeper_cli_path: '/usr/share/zookeeper/bin/zkCli.sh'
+
+...

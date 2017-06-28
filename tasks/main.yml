@@ -8,7 +8,12 @@
         and ansible_distribution != 'Raspbian'
         and ansible_distribution != 'CentOS'
 
-# - include: sysctl.yml
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- include: sysctl.yml
 
 - name: "Generate a Puppet manifest for namespace {{ openio_namespace }}"
   tags:
@@ -19,19 +24,22 @@
     owner: root
     group: root
     mode: 0644
-#
-# - name: "Configure repositories for {{ ansible_os_family }}"
-#   tags:
-#     - install
-#   include : "{{ ansible_os_family }}.yml"
-#   when: ( ansible_os_family == 'Debian' and not ansible_architecture.lower().startswith('arm') )
-#         or ansible_os_family == 'Ubuntu' or ansible_os_family == 'RedHat' or ansible_os_family == 'Raspbian'
-#
-# - name: "Configure repositories for Raspbian"
-#   tags:
-#     - install
-#   include : Raspbian.yml
-#   when: ansible_os_family == 'Debian' and ansible_architecture.lower().startswith('arm')
+
+- include: "{{ item }}"
+  tags:
+    - install
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: "Ensure directories are created"
+  file:
+    path: "{{ item.mountpoint }}/{{ openio_namespace }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0751
+  with_items: "{{ openio_data_mounts }} + {{ openio_metadata_mounts }}"
 
 - name: "Bootstrapping OpenIO for namespace {{ openio_namespace }}"
   tags:
@@ -39,3 +47,4 @@
   include: bootstrap.yml
   when:
     - openio_bootstrap == true
+...

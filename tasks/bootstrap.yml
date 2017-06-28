@@ -3,7 +3,6 @@
   command: "{{ openio_puppet_apply }} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
   register: puppet_result
   changed_when: puppet_result.rc == 2
-  failed_when: puppet_result.rc == 1
 
 - name: Check ZooKeeper status
   shell: "echo \"ls /hc/ns/{{ openio_namespace }}\" | {{ openio_zookeeper_cli_path }} -server {{ openio_zk_cluster_ip[0] }}:6005 2>/dev/null | grep -qe srv"
@@ -13,7 +12,7 @@
     - inventory_hostname == groups['openio_zk_cluster'][0]
 
 - name: "Bootstrapping ZooKeeper for namespace {{ openio_namespace }}"
-  command: "/usr/bin/zk-bootstrap.py {{ openio_namespace }} {{ zkbootstrapopt }}"
+  command: "{{ openio_zookeeper_cli_path }} {{ openio_namespace }} {{ zkbootstrapopt }}"
   when:
     - inventory_hostname == groups['openio_zk_cluster'][0]
       and  openio_zk_status.rc != 0
@@ -27,8 +26,8 @@
   pause:
     seconds: 10
 
-- name: "Bootstrapping OpenIO namespace {{ openio_namespace }} with {{ replicas }} replicas"
-  command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ replicas }} --no-rdir"
+- name: "Bootstrapping OpenIO namespace {{ openio_namespace }} with {{ openio_replicas }} replicas"
+  command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ openio_replicas }} --no-rdir"
   when:
     - inventory_hostname == groups['openio_conscience'][0]
 

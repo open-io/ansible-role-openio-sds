@@ -1,7 +1,7 @@
 ---
 - name : RedHat| Install OpenIO puppet module
   yum:
-    name: puppet-openio-sds.noarch
+    name: puppet-openio-sds
     update_cache: yes
     state: present
 ...

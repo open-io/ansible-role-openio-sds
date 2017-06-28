@@ -12,11 +12,10 @@ openio_network_public_ipaddress: '${ipaddress}'
 openio_swift_auth_system: 'tempauth'
 openio_swift_tempauth_users: "['demo:demo:DEMO_PASS:.admin']"
 
-#openio_data_mounts:
-#openio_metadata_mounts:
-
-#zookeeper_cli_path: '/usr/share/zookeeper/bin/zkCli.sh'
-openio_zookeeper_cli_path: '/usr/bin/zkCli.sh'
+openio_data_mounts:
+  - { mountpoint: "/var/lib/oio/sds/{{ openio_namespace}}" }
+openio_metadata_mounts:
+  - { mountpoint: "/var/lib/oio/sds/{{ openio_namespace}}" }
 
 #openio_puppet_manifest: '/etc/oio/sds'
 openio_puppet_manifest: '/root'
@@ -27,7 +26,7 @@ openio_cli_path: 'openio'
 
 openio_namespace: 'OPENIO'
 
-replicas: 3
+openio_replicas: 3
 
 zkbootstrapopt: ''
 
