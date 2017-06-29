@@ -1,3 +1,2 @@
 ---
 # vars file for openio-sds
-sds_openio_repo: "http://mirror.openio.io/pub/repo/openio/sds/{{ sds_version }}"

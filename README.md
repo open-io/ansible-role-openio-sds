@@ -23,7 +23,6 @@ No specific requirement
 
 | Variable      	| Default 					| Comments (type)  |
 | :---          	| :---    					| :---             |
-| `sds_version` 	| `16.10`     					| The SDS version to install |
 | `openio_zk_cluster_ip`		| `['127.1.1.1', '127.2.2.2', '127.3.3.3']`	| List of IP addresses where to install the Zookeeper cluster (3 IPs min / 5 IPs max) |
 | `conscience_ip`	| `'127.1.1.1'`					| IP address where to put the conscience service |
 | `openio_redis_cluster_ip`		| `['127.1.1.1', '127.2.2.2', '127.3.3.3']`					| List os IP addresses of the Redis cluster |

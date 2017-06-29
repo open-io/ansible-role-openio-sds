@@ -30,8 +30,6 @@ openio_replicas: 3
 
 zkbootstrapopt: ''
 
-sds_version: '16.10'
-
 openio_zk_cluster_ip:
   - '127.1.1.1'
   - '127.2.2.2'
