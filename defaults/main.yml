@@ -28,7 +28,7 @@ openio_namespace: 'OPENIO'
 
 openio_replicas: 3
 
-zkbootstrapopt: ''
+openio_zookeeper_bootstrap_options: ''
 
 openio_zk_cluster_ip:
   - '127.1.1.1'
