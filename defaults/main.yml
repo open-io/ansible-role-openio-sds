@@ -28,6 +28,7 @@ openio_namespace: 'OPENIO'
 
 openio_replicas: 3
 
+openio_zookeeper_bootstrap_cmd: '/usr/bin/zk-bootstrap.py'
 openio_zookeeper_bootstrap_options: ''
 
 openio_zk_cluster_ip:

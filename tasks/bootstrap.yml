@@ -12,7 +12,7 @@
     - inventory_hostname == groups['openio_zk_cluster'][0]
 
 - name: "Bootstrapping ZooKeeper for namespace {{ openio_namespace }}"
-  command: "{{ openio_zookeeper_cli_path }} {{ openio_namespace }} {{ openio_zookeeper_bootstrap_options }}"
+  command: "{{ openio_zookeeper_bootstrap_cmd }} {{ openio_namespace }} {{ openio_zookeeper_bootstrap_options }}"
   when:
     - inventory_hostname == groups['openio_zk_cluster'][0]
       and  openio_zk_status.rc != 0
