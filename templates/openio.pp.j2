@@ -66,7 +66,9 @@ openiosds::zookeeper {'zookeeper-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
   servers   => [{% for ip in openio_zk_cluster_ip %}'{{ ip }}:2888:3888'{% if not loop.last %},{% endif %}{% endfor %}],
+  {% if not partition.mountpoint.startswith('/var/lib/oio/sds') %}
   dataDir   => "{{ partition.mountpoint }}/zookeeper-1",
+  {% endif -%}
 }
   {%- endif %}
   {%- if 'openio_redis_cluster' in group_names and loop.index == 1 %}
