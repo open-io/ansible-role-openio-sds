@@ -34,12 +34,12 @@
 - name: Update meta0 services
   command: "{{ openio_gridinit_cmd }} restart @meta0"
   when:
-    - inventory_hostname == groups['openio_directory_m0']
+    - inventory_hostname in groups['openio_directory_m0']
 
 - name: Update meta1 services
   command: "{{ openio_gridinit_cmd }} restart @meta1"
   when:
-    - inventory_hostname == groups['openio_directory_m1']
+    - inventory_hostname in groups['openio_directory_m1']
 
 - name: "Starting services for namespace {{ openio_namespace }}"
   command: "{{ openio_gridinit_cmd }} start"
