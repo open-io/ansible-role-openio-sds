@@ -45,6 +45,5 @@
   tags:
     - openio_bootstrap
   include: bootstrap.yml
-  when:
-    - openio_bootstrap == true
+  when: openio_bootstrap
 ...
