@@ -27,6 +27,8 @@ No specific requirement
 | `conscience_ip`	| `'127.1.1.1'`					| IP address where to put the conscience service |
 | `openio_redis_cluster_ip`		| `['127.1.1.1', '127.2.2.2', '127.3.3.3']`					| List os IP addresses of the Redis cluster |
 | `openio_bootstrap`		| `false`					| Bootstrap the OpenIO namespace |
+| `openio_network_public_ipaddress`	| `'8.8.8.8'`	| local IP adress of the public oioswift API endpoint (if any) |
+| `openio_network_private_ipaddress`	| `'127.x.x.x'`	| local IP address for the private API endpoints of all other (than oiswift) services |
 
 
 ## Dependencies
