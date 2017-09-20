@@ -6,7 +6,7 @@ openio_storage_policy: THREECOPIES
 openio_service_update_policy: "{'meta2'=>'KEEP|3|1|','sqlx'=>'KEEP|3|1|','rdir'=>'KEEP|1|1|user_is_a_service=rawx'}"
 openio_gridinit_cmd: /usr/bin/gridinit_cmd
 
-openio_network_device_internal: '${ipaddress}'
+openio_network_private_ipaddress: '${ipaddress}'
 openio_network_public_ipaddress: '${ipaddress}'
 
 openio_swift_workers: 2
