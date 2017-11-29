@@ -1,22 +1,14 @@
 # Ansible role `openio-sds`
 
-[![Build Status](https://travis-ci.org/cdelgehier/ansible-role-openio-sds.svg?branch=master)](https://travis-ci.org/cdelgehier/ansible-role-openio-sds)
-
 An Ansible role for [OpenIO SDS](http://www.openio.io) Object Storage solution.  
-Specifically, the responsibilities of this role are to:
-
-- Configure the Openio SDS repository
-- Generate the Puppet manifest for each servers
-- Run the Puppet manifest
-
-This role supports Centos 7 and Ubuntu 16.04 Xenial.
+This role install and configure OpenIO SDS.
 
 If you like/use this role, please consider giving it a star or reviewing it on Ansible Galaxy. Thanks!
 
 
 ## Requirements
 
-No specific requirement
+This role supports Centos 7 and Ubuntu 16.04 Xenial.
 
 ## Role Variables
 
@@ -33,7 +25,8 @@ No specific requirement
 
 ## Dependencies
 
-No dependencies.
+You need to configure OpenIO SDS repositories, an [Ansible role
+openio-repo-openio-sds](https://github.com/open-io/ansible-role-repo-openio-sds) exists.
 
 ## Example Playbook
 
@@ -57,5 +50,5 @@ Apache License version 2.0
 
 ## Contributors
 
-- [Cédric Delgehier](https://github.com/cdelgehier/) (maintainer)
-- [Romain Acciari](https://github.com/racciari/)
+- [Cédric Delgehier](https://github.com/cdelgehier/)
+- [Romain Acciari](https://github.com/racciari/) (maintainer)
