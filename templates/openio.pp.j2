@@ -6,6 +6,9 @@ openiosds::namespace {'{{ openio_namespace }}':
   oioproxy_url   => "{{ openio_network_private_ipaddress }}:6006",
   eventagent_url => "beanstalk://{{ openio_network_private_ipaddress }}:6014",
   meta1_digits   => {{ openio_meta1_digits }},
+  ns_storage_policy => '{{ openio_storage_policy }}',
+  ns_service_update_policy => {'meta2'=>'KEEP|3|1|','sqlx'=>'KEEP|3|1|','rdir'=>'KEEP|1|1|user_is_a_service=rawx'},
+  ns_chunk_size => '10485760',
 }
 openiosds::oioproxy {'oioproxy-1':
   num       => 1,
@@ -27,7 +30,7 @@ openiosds::beanstalkd {'beanstalkd-1':
   num       => 1,
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
-  binlogdir => "{{ partition.mountpoint }}/beanstalkd-1",
+  binlogdir => "{{ partition.mountpoint }}/{{ openio_namespace }}/beanstalkd-1",
 }
   {%- endif %}
   {%- if 'openio_directory_m0' in group_names and loop.index == 1 %}
@@ -37,7 +40,7 @@ openiosds::meta0 {'meta0-1':
   num       => 1,
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
-  volume    => "{{ partition.mountpoint }}/meta0-1",
+  volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta0-1",
 }
     {%- endif %}
   {%- if 'openio_directory_m1' in group_names %}
@@ -47,7 +50,7 @@ openiosds::meta1 {'meta1-{{ loop.index }}':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
   port      => {{ 6110 + loop.index }},
-  volume    => "{{ partition.mountpoint }}/meta1-{{ loop.index }}",
+  volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta1-{{ loop.index }}",
 }
   {%- endif %}
 
@@ -56,7 +59,7 @@ openiosds::meta2 {'meta2-{{ loop.index }}':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
   port      => {{ 6120 + loop.index }},
-  volume    => "{{ partition.mountpoint }}/meta2-{{ loop.index }}",
+  volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta2-{{ loop.index }}",
 }
   {%- if 'openio_zk_cluster' in group_names and loop.index == 1 %}
 
@@ -66,9 +69,7 @@ openiosds::zookeeper {'zookeeper-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
   servers   => [{% for ip in openio_zk_cluster_ip %}'{{ ip }}:2888:3888'{% if not loop.last %},{% endif %}{% endfor %}],
-  {% if not partition.mountpoint.startswith('/var/lib/oio/sds') %}
-  dataDir   => "{{ partition.mountpoint }}/zookeeper-1",
-  {% endif -%}
+  dataDir   => "{{ partition.mountpoint }}/{{ openio_namespace }}/zookeeper-1",
 }
   {%- endif %}
   {%- if 'openio_redis_cluster' in group_names and loop.index == 1 %}
@@ -86,7 +87,7 @@ openiosds::redissentinel {'redissentinel-1':
   num         => 1,
   ns          => '{{ openio_namespace }}',
   ipaddress   => "{{ openio_network_private_ipaddress }}",
-  dir         => "{{ partition.mountpoint }}/redissentinel-1",
+  dir         => "{{ partition.mountpoint }}/{{ openio_namespace }}/redissentinel-1",
   master_name => '{{ openio_namespace }}-master-1',
   redis_host  => "{{ openio_network_private_ipaddress }}",
 }
@@ -94,7 +95,7 @@ openiosds::redis {'redis-1':
   num       => 1,
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
-  dir       => "{{ partition.mountpoint }}/redis-1",
+  dir       => "{{ partition.mountpoint }}/{{ openio_namespace }}/redis-1",
   {%- if openio_network_private_ipaddress != openio_redis_cluster_ip[0] %}
 
   slaveof   => '{{ openio_redis_cluster_ip[0] }} 6011',
@@ -113,19 +114,19 @@ openiosds::rawx {'rawx-{{ loop.index }}':
   ns           => '{{ openio_namespace }}',
   ipaddress    => "{{ openio_network_private_ipaddress }}",
   port         => {{ 6200 + loop.index }},
-  documentRoot => "{{ partition.mountpoint }}/rawx-{{ loop.index }}",
+  documentRoot => "{{ partition.mountpoint }}/{{ openio_namespace }}/rawx-{{ loop.index }}",
 }
 openiosds::rdir {'rdir-{{ loop.index }}':
   num       => {{ loop.index }},
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
   port      => {{ 6300 + loop.index }},
-  db_path   => "{{ partition.mountpoint }}/rdir-{{ loop.index }}",
+  db_path   => "{{ partition.mountpoint }}/{{ openio_namespace }}/rdir-{{ loop.index }}",
 }
 openiosds::oioblobindexer {'oio-blob-indexer-rawx-{{ loop.index }}':
   num    => {{ loop.index }},
   ns     => '{{ openio_namespace }}',
-  volume => "{{ partition.mountpoint }}/rawx-{{ loop.index }}",
+  volume => "{{ partition.mountpoint }}/{{ openio_namespace }}/rawx-{{ loop.index }}",
 }
 {%- endfor %}
 {# end loop #}
@@ -136,29 +137,29 @@ openiosds::conscience {'conscience-1':
   num                   => 1,
   ns                    => '{{ openio_namespace }}',
   ipaddress             => "{{ openio_network_private_ipaddress }}",
-  service_update_policy => {{ openio_service_update_policy }},
-  storage_policy        => '{{ openio_storage_policy }}',
 }
 {%- endif %}
 {%- if 'openio_swift' in group_names %}
 
 openiosds::oioswift {'oioswift-1':
-  num              => 1,
-  ns               => '{{ openio_namespace }}',
-  ipaddress        => "{{ openio_network_public_ipaddress }}",
-  sds_proxy_url    => "http://{{ openio_network_private_ipaddress }}:6006",
-  auth_system      => '{{ openio_swift_auth_system }}',
+  num               => 1,
+  ns                => '{{ openio_namespace }}',
+  ipaddress         => '{{ openio_network_public_ipaddress }}',
+  sds_proxy_url     => 'http://{{ openio_network_private_ipaddress }}:6006',
+  auth_system       => '{{ openio_swift_auth_system }}',
+  region_name       => '{{ openio_swift_region_name }}',
+  middleware_swift3 => {{ openio_swift_middleware_swift3 }},
   {%- if openio_swift_tempauth_users %}
 
   tempauth_users   => {{ openio_swift_tempauth_users }},
   {%- endif %}
 
-  memcache_servers => "{{ openio_network_private_ipaddress }}:6019",
+  memcache_servers => '{{ openio_network_private_ipaddress }}:6019',
   memcache_max_connections => 500,
 }
 openiosds::memcached {'memcached-1':
   num       => 1,
   ns        => '{{ openio_namespace }}',
-  ipaddress => "{{ openio_network_private_ipaddress }}",
+  ipaddress => '{{ openio_network_private_ipaddress }}',
 }
 {%- endif %}
