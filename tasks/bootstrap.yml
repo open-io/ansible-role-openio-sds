@@ -1,6 +1,10 @@
 ---
+- name: "Adapting to Puppet version"
+  shell: "puppet --version|cut -c1"
+  register: puppet_majorversion
+
 - name: "Applying Puppet manifest for namespace {{ openio_namespace }}"
-  command: "{{ openio_puppet_apply }} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
+  command: "{{ openio_puppet4_apply if ( puppet_majorversion == '4' ) else openio_puppet3_apply }} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
   register: puppet_result
   changed_when: puppet_result.rc == 2
 
