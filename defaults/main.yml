@@ -11,16 +11,19 @@ openio_network_public_ipaddress: '${ipaddress}'
 
 openio_swift_auth_system: 'tempauth'
 openio_swift_tempauth_users: "['demo:demo:DEMO_PASS:.admin']"
+openio_swift_region_name: 'RegionOne'
+openio_swift_middleware_swift3: "{'location' => 'RegionOne'}"
 
 openio_data_mounts:
-  - { mountpoint: "/var/lib/oio/sds/{{ openio_namespace}}" }
+  - { mountpoint: "/var/lib/oio/sds" }
 openio_metadata_mounts:
-  - { mountpoint: "/var/lib/oio/sds/{{ openio_namespace}}" }
+  - { mountpoint: "/var/lib/oio/sds" }
 
 #openio_puppet_manifest: '/etc/oio/sds'
 openio_puppet_manifest: '/root'
 
-openio_puppet_apply: 'puppet apply --no-stringify_facts'
+openio_puppet3_apply: 'puppet apply --no-stringify_facts'
+openio_puppet4_apply: 'puppet apply'
 
 openio_cli_path: 'openio'
 
