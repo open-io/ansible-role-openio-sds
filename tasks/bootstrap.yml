@@ -10,7 +10,7 @@
   changed_when: puppet_result.rc == 2
 
 - name: Check ZooKeeper status
-  shell: "echo \"ls /hc/ns/{{ openio_namespace }}\" | {{ openio_zookeeper_cli_path }} -server {{ openio_zk_cluster_ip[0] }}:6005 2>/dev/null | grep -qe srv"
+  shell: "echo 'ls /hc/ns/{{ openio_namespace }}' | {{ openio_zookeeper_cli_path }} -server {{ openio_zk_cluster_ip[0] }}:6005 2>/dev/null | grep -qe srv"
   register: openio_zk_status
   ignore_errors: yes
   when: inventory_hostname == groups['openio_zk_cluster'][0]
