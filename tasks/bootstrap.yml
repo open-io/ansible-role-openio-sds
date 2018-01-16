@@ -29,6 +29,27 @@
     - inventory_hostname == groups['openio_zk_cluster'][0]
       and openio_zk_status.rc != 0
 
+- name: "Gather PIDs of meta0/meta1 services"
+  shell: "{{ openio_gridinit_cmd }} status2 @meta0 @meta1 | grep {{openio_namespace}} | awk '{print $3;}'"
+  register: m0m1_pid
+
+- name: "Restart meta0/meta1 services"
+  shell: "{{ openio_gridinit_cmd }} restart $({{ openio_gridinit_cmd }} status @meta0 @meta1 |
+          grep -e ' {{ openio_namespace }},' | awk '{print $1}')"
+
+- name: "Check that meta0/meta1 have restarted"
+  wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+  with_items: "{{ m0m1_pid.stdout_lines }}"
+  ignore_errors: yes
+  register: m0m1_pid_killed
+  timeout: 30
+
+- name: "Kill remaining meta0/meta1"
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ m0m1_pid_killed.results | select('failed') | map(attribute='item') | list }}"
+
 - name: "Unlocking namespace {{ openio_namespace }}"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} cluster unlockall"
   when:
