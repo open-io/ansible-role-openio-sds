@@ -30,12 +30,12 @@
       and openio_zk_status.rc != 0
 
 - name: "Gather PIDs of meta0/meta1 services"
-  shell: "{{ openio_gridinit_cmd }} status2 @meta0 @meta1 | grep {{openio_namespace}} | awk '{print $3;}'"
+  shell: "{{ openio_gridinit_cmd }} status2 @meta0 @meta1 | grep {{openio_namespace}} | awk '{print $3}'"
   register: m0m1_pid
 
 - name: "Restart meta0/meta1 services"
   shell: "{{ openio_gridinit_cmd }} restart $({{ openio_gridinit_cmd }} status @meta0 @meta1 |
-          grep -e ' {{ openio_namespace }},' | awk '{print $1}')"
+          grep ' {{ openio_namespace }},' | awk '{print $1}')"
 
 - name: "Check that meta0/meta1 have restarted"
   wait_for:
