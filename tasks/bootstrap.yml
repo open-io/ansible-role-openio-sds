@@ -71,10 +71,26 @@
   when:
     - inventory_hostname == groups['openio_conscience'][0]
 
-- name: "Update meta0/meta1 services"
-  command: "{{ openio_gridinit_cmd }} restart @meta0 @meta1"
-  when:
-    - inventory_hostname in (groups['openio_directory_m1'] + groups['openio_directory_m0'])
+- name: "Gather PIDs of meta0/meta1 services"
+  shell: "{{ openio_gridinit_cmd }} status2 @meta0 @meta1 | grep {{openio_namespace}} | awk '{print $3}'"
+  register: m0m1_pid
+
+- name: "Restart meta0/meta1 services"
+  shell: "{{ openio_gridinit_cmd }} restart $({{ openio_gridinit_cmd }} status @meta0 @meta1 |
+          grep ' {{ openio_namespace }},' | awk '{print $1}')"
+
+- name: "Check that meta0/meta1 have restarted"
+  wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+  with_items: "{{ m0m1_pid.stdout_lines }}"
+  ignore_errors: yes
+  register: m0m1_pid_killed
+  timeout: 30
+
+- name: "Kill remaining meta0/meta1"
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ m0m1_pid_killed.results | select('failed') | map(attribute='item') | list }}"
 
 - name: "Starting services for namespace {{ openio_namespace }}"
   command: "{{ openio_gridinit_cmd }} start @{{ openio_namespace}}"
