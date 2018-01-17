@@ -50,21 +50,9 @@
   shell: "kill -9 {{ item }}"
   with_items: "{{ m0m1_pid_killed.results | select('failed') | map(attribute='item') | list }}"
 
-- name: "Unlocking namespace {{ openio_namespace }}"
-  command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} cluster unlockall"
-  when:
-    - inventory_hostname == groups['openio_conscience'][0]
-
-- name: "Waiting for {{  groups['openio_directory_m0'] | length }} meta0 and {{ groups['openio_directory_m1'] | length }}
-         meta1 scores to increase"
-  shell: "{{ openio_cli_path }} cluster list meta0 meta1 --oio-ns={{ openio_namespace }}
-          -f value -c Score | grep -c '^0$' || true"
-  register: metas_count
-  until: "(metas_count.stdout | int) == 0"
-  retries: 10
-  delay: 1
-  when:
-    - inventory_hostname == groups['openio_conscience'][0]
+- name: "Unlock scores on meta0/meta1 services"
+  shell: "{{ openio_cli_path }} cluster unlockall meta0 meta1 --oio-ns={{ openio_namespace }} &&
+          {{ openio_cli_path }} cluster wait      meta0 meta1 --oio-ns={{ openio_namespace }}"
 
 - name: "Bootstrapping OpenIO namespace {{ openio_namespace }} with {{ openio_replicas }} replicas"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ openio_replicas }} --no-rdir"
@@ -95,15 +83,9 @@
 - name: "Starting services for namespace {{ openio_namespace }}"
   command: "{{ openio_gridinit_cmd }} start @{{ openio_namespace}}"
 
-- name: "Waiting for scores to increase"
-  shell: "{{ openio_cli_path }} cluster list --oio-ns={{ openio_namespace }}
-          -f value -c Score | grep -c '^0$' || true"
-  register: unscored_count
-  until: "(unscored_count.stdout | int) == 0"
-  retries: 10
-  delay: 1
-  when:
-    - inventory_hostname == groups['openio_conscience'][0]
+- name: "Unlock scores"
+  shell: "{{ openio_cli_path }} cluster unlockall --oio-ns={{ openio_namespace }} &&
+          {{ openio_cli_path }} cluster wait      --oio-ns={{ openio_namespace }}"
 
 - name: "Bootstrapping Reverse Directory for namespace {{ openio_namespace }}"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} volume admin bootstrap"
