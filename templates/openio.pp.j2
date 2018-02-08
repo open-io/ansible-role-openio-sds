@@ -89,7 +89,7 @@ openiosds::redissentinel {'redissentinel-1':
   ipaddress   => "{{ openio_network_private_ipaddress }}",
   dir         => "{{ partition.mountpoint }}/{{ openio_namespace }}/redissentinel-1",
   master_name => '{{ openio_namespace }}-master-1',
-  redis_host  => "{{ openio_network_private_ipaddress }}",
+  redis_host  => "{{ openio_redis_cluster_ip[0] }}",
 }
 openiosds::redis {'redis-1':
   num       => 1,
