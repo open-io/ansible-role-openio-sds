@@ -23,7 +23,7 @@ openio_metadata_mounts:
 openio_puppet_manifest: '/root'
 
 openio_puppet3_apply: 'puppet apply --no-stringify_facts'
-openio_puppet4_apply: 'puppet apply'
+openio_puppet4_apply: 'puppet apply --modulepath=/usr/share/puppet/modules/'
 
 openio_cli_path: 'openio'
 
