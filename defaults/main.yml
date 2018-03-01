@@ -13,6 +13,7 @@ openio_swift_auth_system: 'tempauth'
 openio_swift_tempauth_users: "['demo:demo:DEMO_PASS:.admin']"
 openio_swift_region_name: 'RegionOne'
 openio_swift_middleware_swift3: "{'location' => 'RegionOne'}"
+openio_swift_middleware_containerhierarchy: false
 
 openio_data_mounts:
   - { mountpoint: "/var/lib/oio/sds" }
