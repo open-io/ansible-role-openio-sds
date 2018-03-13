@@ -1,0 +1,38 @@
+---
+- name: "Assign rdir"
+  changed_when: true
+  debug:
+      msg: "Updating rdir assignment on {{openio_namespace}}"
+
+- name: "Assign rdir: save locked"
+  shell: "{{ openio_cli_path }} cluster list --oio-ns={{ openio_namespace }} -f value | awk '{if($7==0) print $1,$2;}'"
+  register: locked_services
+  changed_when: true
+  when:
+      - openio_bootstrap != 'True'
+      - inventory_hostname == groups['openio_conscience'][0]
+
+# TODO: Without an update in SDS to be able to assign on locked rawx, we need to unlock rawx scores for a moment
+# in order to perform rdir assignment.
+# See https://github.com/open-io/oio-sds/issues/1337
+- name: "Assign rdir: unlock"
+  shell: "{{ openio_cli_path }} cluster unlockall --oio-ns={{ openio_namespace }} rawx rdir &&
+          {{ openio_cli_path }} cluster wait      --oio-ns={{ openio_namespace }} rawx rdir"
+  changed_when: true
+  when: openio_bootstrap != 'True'
+
+- name: "Assign rdir: assign"
+  command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} volume admin bootstrap"
+  changed_when: true
+  when:
+      - inventory_hostname == groups['openio_conscience'][0]
+
+- name: "Assign rdir: lock"
+  shell: "{{ openio_cli_path }} cluster lock --oio-ns={{ openio_namespace }} {{ item }} -f yaml"
+  changed_when: true
+  with_items:
+      - "{{ locked_services.stdout_lines }}"
+  when:
+      - openio_bootstrap != 'True'
+      - inventory_hostname == groups['openio_conscience'][0]
+...

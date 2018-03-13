@@ -1,0 +1,21 @@
+---
+- name: "Adapting to Puppet version"
+  shell: "puppet --version|cut -c1"
+  register: puppet_majorversion
+
+- name: "Applying Puppet manifest for namespace {{ openio_namespace }}"
+  command: "{{ openio_puppet4_apply if ( puppet_majorversion.stdout == '4' ) else openio_puppet3_apply }} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
+  register: puppet_result
+  changed_when: puppet_result.rc == 2
+
+- name: "Restart conscience agent to update service list"
+  shell: "gridinit_cmd restart $({{openio_gridinit_cmd}} status | \
+          grep {{openio_namespace}} | grep conscienceagent | awk '{ print $1 }')"
+
+# NOTE: Currently there isn't any way to check that all services have registered
+# in the conscience, so we just have to wait
+- name: "Wait to make sure  all services to be registered in the conscience"
+  wait_for: timeout=10
+  delegate_to: "{{ groups['openio_conscience'][0] }}"
+  when: openio_bootstrap != 'True'
+...

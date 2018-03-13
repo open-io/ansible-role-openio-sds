@@ -1,0 +1,30 @@
+...
+- name: "Restart meta0 meta1"
+  changed_when: true
+  debug:
+      msg: "Restarting meta0 and meta1 on namespace {{openio_namespace}}"
+
+- name: "Restart meta0 meta1: pid"
+  changed_when: true
+  shell: "{{ openio_gridinit_cmd }} status2 @meta0 @meta1 | grep {{openio_namespace}} | awk '{print $3}'"
+  register: m0m1_pid
+
+- name: "Restart meta0 meta1: restart"
+  shell: "{{ openio_gridinit_cmd }} restart $({{ openio_gridinit_cmd }} status @meta0 @meta1 |
+          grep ' {{ openio_namespace }},' | awk '{print $1}')"
+
+- name: "Restart meta0 meta1: wait"
+  changed_when: true
+  wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+  with_items: "{{ m0m1_pid.stdout_lines }}"
+  ignore_errors: yes
+  register: m0m1_pid_killed
+  timeout: 30
+
+- name: "Restart meta0 meta1: cleanup"
+  changed_when: true
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ m0m1_pid_killed.results | select('failed') | map(attribute='item') | list }}"
+---

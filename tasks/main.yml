@@ -41,6 +41,11 @@
     mode: 0751
   with_items: "{{ openio_data_mounts }} + {{ openio_metadata_mounts }}"
 
+- name: "Update configuration on servers"
+  tags:
+    - install
+  include: update.yml
+
 - name: "Bootstrapping OpenIO for namespace {{ openio_namespace }}"
   tags:
     - openio_bootstrap
