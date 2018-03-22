@@ -32,6 +32,9 @@ openio_namespace: 'OPENIO'
 
 openio_replicas: 3
 
+openio_minimal_score_for_volume_admin_bootstrap: 50
+openio_minimal_score_for_directory_bootstrap: 50
+
 openio_zookeeper_bootstrap_cmd: '/usr/bin/zk-bootstrap.py'
 openio_zookeeper_bootstrap_options: ''
 

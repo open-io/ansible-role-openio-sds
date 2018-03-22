@@ -35,7 +35,7 @@
 
 - name: "Unlock scores on meta0/meta1 services"
   shell: "{{ openio_cli_path }} cluster unlockall meta0 meta1 --oio-ns={{ openio_namespace }} &&
-          {{ openio_cli_path }} cluster wait      meta0 meta1 --oio-ns={{ openio_namespace }}"
+          {{ openio_cli_path }} cluster wait      meta0 meta1 --oio-ns={{ openio_namespace }} -s {{ openio_minimal_score_for_directory_bootstrap }}"
 
 - name: "Bootstrapping OpenIO namespace {{ openio_namespace }} with {{ openio_replicas }} replicas"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ openio_replicas }} --no-rdir"
@@ -50,8 +50,8 @@
   command: "{{ openio_gridinit_cmd }} start @{{ openio_namespace}}"
 
 - name: "Unlock scores"
-  shell: "{{ openio_cli_path }} cluster unlockall --oio-ns={{ openio_namespace }} &&
-          {{ openio_cli_path }} cluster wait      --oio-ns={{ openio_namespace }}"
+  shell: "{{ openio_cli_path }} cluster unlockall      --oio-ns={{ openio_namespace }} &&
+          {{ openio_cli_path }} cluster wait rawx rdir --oio-ns={{ openio_namespace }} -s {{ openio_minimal_score_for_volume_admin_bootstrap }}"
 
 - name: "Bootstrapping Reverse Directory for namespace {{ openio_namespace }}"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} volume admin bootstrap"
