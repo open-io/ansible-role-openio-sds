@@ -81,6 +81,6 @@ openio_sds_sysctl_entries:
   net.ipv4.udp_wmem_min: 16384
   net.ipv4.tcp_max_tw_buckets: 1440000
   net.ipv4.tcp_tw_reuse: 1
-  net.ipv4.tcp_syncookies: 1
+  net.ipv4.tcp_syncookies: 0
   net.ipv4.tcp_tw_recycle: 1
 ...
