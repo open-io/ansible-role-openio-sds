@@ -149,27 +149,27 @@ openiosds::oioswift {'oioswift-1':
   auth_system       => '{{ openio_swift_auth_system }}',
   region_name       => '{{ openio_swift_region_name }}',
   middleware_swift3 => {{ openio_swift_middleware_swift3 }},
-  {%- if openio_keystone_auth_uri %}
+  {%- if openio_keystone_auth_uri is defined %}
 
   auth_uri          => '{{ openio_keystone_auth_uri }}',
   {%- endif %}
-  {%- if openio_keystone_auth_url %}
+  {%- if openio_keystone_auth_url is defined %}
 
   auth_url          => '{{ openio_keystone_auth_url }}',
   {%- endif %}
-  {%- if openio_sds_pool_connections %}
+  {%- if openio_sds_pool_connections is defined %}
 
   sds_pool_connections => '{{ openio_sds_pool_connections }}',
   {%- endif %}
-  {%- if openio_sds_pool_maxsize %}
+  {%- if openio_sds_pool_maxsize is defined %}
 
   sds_pool_maxsize => '{{ openio_sds_pool_maxsize }}',
   {%- endif %}
-  {%- if openio_swift_middleware_containerhierarchy %}
+  {%- if openio_swift_middleware_containerhierarchy is defined %}
 
   middleware_containerhierarchy => true,
   {%- endif %}
-  {%- if openio_swift_tempauth_users %}
+  {%- if openio_swift_tempauth_users is defined %}
 
   tempauth_users   => {{ openio_swift_tempauth_users }},
   {%- endif %}
