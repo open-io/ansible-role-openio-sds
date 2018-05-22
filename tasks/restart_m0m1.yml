@@ -1,0 +1,35 @@
+---
+
+- name: "Restart meta0 meta1: services infos"
+  command: "{{ openio_gridinit_cmd }} status @meta0 @meta1"
+  ignore_errors: true
+  register: m0m1_svcs
+
+- name: "Restart meta0 meta1: PIDs"
+  shell: "echo '{{ m0m1_svcs.stdout }}' | awk '/ {{ openio_namespace }},/ {print $3}'"
+  register: m0m1_pids
+
+- name: "Restart meta0 meta1: services names"
+  shell: "echo '{{ m0m1_svcs.stdout }}' | awk '/ {{ openio_namespace }},/ {print $1}'"
+  register: m0m1_names
+
+- name: "Restart meta0 meta1: restart services"
+  command: "{{ openio_gridinit_cmd }} restart {{ m0m1_names.stdout }}"
+
+- name: "Restart meta0 meta1: wait for processes to die"
+  wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+  when: (item | int) != -1
+  with_items: "{{ m0m1_pids.stdout_lines }}"
+  ignore_errors: true
+  register: m0m1_pids_killed
+  timeout: 30
+
+- name: "Restart meta0 meta1: cleanup stray processes by force-killing"
+  changed_when: true
+  command: "kill -9 {{ item }}"
+  when: (item | int) != -1
+  with_items: "{{ m0m1_pids_killed.results | select('failed') | map(attribute='item') | list }}"
+
+...

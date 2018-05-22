@@ -30,13 +30,8 @@
     - inventory_hostname == groups['openio_zk_cluster'][0]
     - openio_zk_status.rc != 0
 
-- name: Notify restart meta0 meta1
-  debug:
-    msg: Notify restart meta0 meta1
-  notify: "Restart meta0 meta1"
-
-- name: "Run handlers"
-  meta: flush_handlers
+- name: 'Restart meta0 & meta1'
+  include_tasks: restart_m0m1.yml
 
 - name: "Unlock scores on meta0/meta1 services"
   command: "{{ openio_cli_path }} cluster unlockall meta0 meta1 --oio-ns={{ openio_namespace }}"
@@ -50,13 +45,8 @@
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ openio_replicas }} --no-rdir"
   when: inventory_hostname == groups['openio_conscience'][0]
 
-- name: Notify restart meta0 meta1
-  debug:
-    msg: Notify restart meta0 meta1
-  notify: "Restart meta0 meta1"
-
-- name: "Run handlers"
-  meta: flush_handlers
+- name: 'Restart meta0 & meta1'
+  include_tasks: restart_m0m1.yml
 
 - name: "Starting services for namespace {{ openio_namespace }}"
   command: "{{ openio_gridinit_cmd }} start @{{ openio_namespace }}"
