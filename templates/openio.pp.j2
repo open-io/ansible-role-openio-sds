@@ -145,6 +145,7 @@ openiosds::oioswift {'oioswift-1':
   num               => 1,
   ns                => '{{ openio_namespace }}',
   ipaddress         => '{{ openio_network_public_ipaddress }}',
+  workers           => {{ openio_swift_workers }},
   sds_proxy_url     => 'http://{{ openio_network_private_ipaddress }}:6006',
   auth_system       => '{{ openio_swift_auth_system }}',
   region_name       => '{{ openio_swift_region_name }}',

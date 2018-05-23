@@ -9,6 +9,7 @@ openio_gridinit_cmd: /usr/bin/gridinit_cmd
 openio_network_device_internal: '${ipaddress}'
 openio_network_public_ipaddress: '${ipaddress}'
 
+openio_swift_workers: 2
 openio_swift_auth_system: 'tempauth'
 openio_swift_tempauth_users: "['demo:demo:DEMO_PASS:.admin']"
 openio_swift_region_name: 'RegionOne'
