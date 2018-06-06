@@ -20,11 +20,11 @@
   wait_for:
     path: "/proc/{{ item }}/status"
     state: absent
+    timeout: 30
   when: (item | int) != -1
   with_items: "{{ m0m1_pids.stdout_lines }}"
   ignore_errors: true
   register: m0m1_pids_killed
-  timeout: 30
 
 - name: "Restart meta0 meta1: cleanup stray processes by force-killing"
   changed_when: true
