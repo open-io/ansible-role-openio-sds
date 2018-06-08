@@ -175,7 +175,7 @@ openiosds::oioswift {'oioswift-1':
   tempauth_users   => {{ openio_swift_tempauth_users }},
   {%- endif %}
 
-  memcache_servers => '{{ openio_network_private_ipaddress }}:6019',
+  memcache_servers => "{% for ip in openio_memcache_farm_ip %}{{ ip }}:6019{% if not loop.last %},{% endif %}{% endfor %}",
   memcache_max_connections => 500,
 }
 openiosds::memcached {'memcached-1':
