@@ -12,7 +12,8 @@
 - name: Check ZooKeeper status
   shell: "echo 'ls /hc/ns/{{ openio_namespace }}' | {{ openio_zookeeper_cli_path }} -server {{ openio_zk_cluster_ip[0] }}:6005 2>/dev/null | grep -qe srv"
   register: openio_zk_status
-  ignore_errors: yes
+  ignore_errors: true
+  failed_when: false
   when: inventory_hostname == groups['openio_zk_cluster'][0]
 
 - name: Wait for Zookeeper to be online
