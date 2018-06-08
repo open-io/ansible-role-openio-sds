@@ -42,7 +42,7 @@ openiosds::meta0 {'meta0-1':
   ipaddress => "{{ openio_network_private_ipaddress }}",
   volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta0-1",
 }
-    {%- endif %}
+  {%- endif %}
   {%- if 'openio_directory_m1' in group_names %}
 
 openiosds::meta1 {'meta1-{{ loop.index }}':
@@ -53,6 +53,7 @@ openiosds::meta1 {'meta1-{{ loop.index }}':
   volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta1-{{ loop.index }}",
 }
   {%- endif %}
+  {%- if 'openio_directory_m2' in group_names %}
 
 openiosds::meta2 {'meta2-{{ loop.index }}':
   num       => {{ loop.index }},
@@ -61,6 +62,7 @@ openiosds::meta2 {'meta2-{{ loop.index }}':
   port      => {{ 6120 + loop.index }},
   volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta2-{{ loop.index }}",
 }
+  {%- endif %}
   {%- if 'openio_zk_cluster' in group_names and loop.index == 1 %}
 
 ###  ZooKeeper
@@ -72,7 +74,7 @@ openiosds::zookeeper {'zookeeper-1':
   dataDir   => "{{ partition.mountpoint }}/{{ openio_namespace }}/zookeeper-1",
 }
   {%- endif %}
-  {%- if 'openio_redis_cluster' in group_names and loop.index == 1 %}
+  {%- if 'openio_account' in group_names and loop.index == 1 %}
 
 ### Account
 openiosds::account {'account-1':
@@ -82,6 +84,9 @@ openiosds::account {'account-1':
   sentinel_hosts       => '{% for ip  in openio_redis_cluster_ip %}{{ ip }}:6012{% if not loop.last %},{% endif %}{% endfor %}',
   sentinel_master_name => '{{ openio_namespace }}-master-1',
 }
+  {%- endif %}
+  {%- if 'openio_redis_cluster' in group_names and loop.index == 1 %}
+
 ### Redis
 openiosds::redissentinel {'redissentinel-1':
   num         => 1,
@@ -107,6 +112,7 @@ openiosds::redis {'redis-1':
 {# end loop #}
 {# Loop over openio_data_mounts for data services #}
 {%- for partition in openio_data_mounts %}
+  {%- if 'openio_rawx' in group_names %}
 
 ### Data services {{ loop.index }}
 openiosds::rawx {'rawx-{{ loop.index }}':
@@ -128,6 +134,7 @@ openiosds::oioblobindexer {'oio-blob-indexer-rawx-{{ loop.index }}':
   ns     => '{{ openio_namespace }}',
   volume => "{{ partition.mountpoint }}/{{ openio_namespace }}/rawx-{{ loop.index }}",
 }
+  {%- endif %}
 {%- endfor %}
 {# end loop #}
 {%- if 'openio_conscience' in group_names %}
