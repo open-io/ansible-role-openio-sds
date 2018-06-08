@@ -3,6 +3,7 @@
 - name: "Restart meta0 meta1: services infos"
   command: "{{ openio_gridinit_cmd }} status @meta0 @meta1"
   ignore_errors: true
+  failed_when: false
   register: m0m1_svcs
 
 - name: "Restart meta0 meta1: PIDs"
@@ -24,6 +25,8 @@
   when: (item | int) != -1
   with_items: "{{ m0m1_pids.stdout_lines }}"
   ignore_errors: true
+  # Do not uncomment the following, as we're checking this with the `failed` filter
+  # failed_when: false
   register: m0m1_pids_killed
 
 - name: "Restart meta0 meta1: cleanup stray processes by force-killing"
