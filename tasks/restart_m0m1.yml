@@ -27,8 +27,7 @@
   loop_control:
     loop_var: pid
   ignore_errors: true
-  # Do not uncomment the following, as we're checking this with the `failed` filter
-  # failed_when: false
+  failed_when: false
   register: m0m1_pids_killed
 
 - name: "Restart meta0 meta1: cleanup stray processes by force-killing"
