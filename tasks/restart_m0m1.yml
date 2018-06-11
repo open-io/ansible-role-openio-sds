@@ -19,11 +19,13 @@
 
 - name: "Restart meta0 meta1: wait for processes to die"
   wait_for:
-    path: "/proc/{{ item }}/status"
+    path: "/proc/{{ pid }}/status"
     state: absent
     timeout: 30
-  when: (item | int) != -1
+  when: (pid | int) != -1
   with_items: "{{ m0m1_pids.stdout_lines }}"
+  loop_control:
+    loop_var: pid
   ignore_errors: true
   # Do not uncomment the following, as we're checking this with the `failed` filter
   # failed_when: false
@@ -34,6 +36,6 @@
   # The proc file test is in case the process finally disappeared
   shell: "kill -9 {{ item }} || [ ! -f /proc/{{ item }}/status ]"
   when: (item | int) != -1
-  with_items: "{{ m0m1_pids_killed.results | select('failed') | map(attribute='item') | list }}"
+  with_items: "{{ m0m1_pids_killed.results | select('failed') | map(attribute='pid') | list }}"
 
 ...
