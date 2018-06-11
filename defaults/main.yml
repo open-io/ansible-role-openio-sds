@@ -54,6 +54,8 @@ openio_redis_cluster_ip:
 
 openio_bootstrap: false
 
+openio_sds_default_account: '{{ openio_namespace | lower }}'
+
 openio_sds_sysctl_managed: true
 openio_sds_sysctl_template_dest: /etc/sysctl.d/openio-sds.conf
 openio_sds_sysctl_entries:
