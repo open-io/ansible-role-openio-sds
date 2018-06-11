@@ -166,9 +166,9 @@ openiosds::oioswift {'oioswift-1':
 
   sds_pool_maxsize => '{{ openio_sds_pool_maxsize }}',
   {%- endif %}
-  {%- if openio_swift_middleware_containerhierarchy is defined  and openio_swift_middleware_containerhierarchy %}
+  {%- if openio_swift_middleware_containerhierarchy is defined %}
 
-  middleware_containerhierarchy => true,
+  middleware_containerhierarchy => {{ openio_swift_middleware_containerhierarchy }},
   {%- endif %}
   {%- if openio_swift_tempauth_users is defined %}
 
