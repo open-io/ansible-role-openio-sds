@@ -4,4 +4,9 @@
     name: puppet-openio-sds
     update_cache: yes
     state: present
+
+- name : RedHat| Install nmap-ncat package
+  yum:
+    name: nmap-ncat
+    state: present
 ...
