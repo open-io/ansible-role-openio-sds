@@ -1,11 +1,11 @@
 ---
-- name : RedHat| Install OpenIO puppet module
+- name: RedHat| Install OpenIO puppet module
   yum:
     name: puppet-openio-sds
-    update_cache: yes
+    update_cache: true
     state: present
 
-- name : RedHat| Install nmap-ncat package
+- name: RedHat| Install nmap-ncat package
   yum:
     name: nmap-ncat
     state: present
