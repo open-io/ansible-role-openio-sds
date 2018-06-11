@@ -34,8 +34,11 @@
 - name: "Restart meta0 meta1: cleanup stray processes by force-killing"
   changed_when: true
   # The proc file test is in case the process finally disappeared
-  shell: "kill -9 {{ item }} || [ ! -f /proc/{{ item }}/status ]"
-  when: (item | int) != -1
-  with_items: "{{ m0m1_pids_killed.results | select('failed') | map(attribute='pid') | list }}"
+  shell: "kill -9 {{ item.pid }} || [ ! -f /proc/{{ item.pid }}/status ]"
+  when:
+    - (item.pid | int) != -1
+    - (item.state is defined and item.state != 'absent') or
+      (item.msg is defined and item.msg[:7] == 'Timeout')
+  with_items: "{{ m0m1_pids_killed.results }}"
 
 ...
