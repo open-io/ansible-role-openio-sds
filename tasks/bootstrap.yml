@@ -30,6 +30,10 @@
   when:
     - inventory_hostname == groups['openio_zk_cluster'][0]
     - openio_zk_status.rc != 0
+  register: zk_bootstrap
+  until: zk_bootstrap is success
+  retries: 5
+  delay: 10
 
 - name: 'Restart meta0 & meta1'
   include_tasks: restart_m0m1.yml
