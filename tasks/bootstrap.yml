@@ -5,7 +5,7 @@
   register: puppet_majorversion
 
 - name: "Applying Puppet manifest for namespace {{ openio_namespace }}"
-  command: "{{ openio_puppet4_apply if ( puppet_majorversion.stdout == '4' ) else openio_puppet3_apply }} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
+  command: "{{ openio_puppet4_apply if ( puppet_majorversion.stdout == '4' ) else openio_puppet3_apply }} {{ openio_sds_puppet_apply_options if openio_sds_puppet_apply_options is defined }} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
   register: puppet_result
   changed_when: puppet_result.rc == 2
 
