@@ -1,18 +1,18 @@
 ---
 
-- name: "Restart meta0 meta1: services infos"
+- name: "Restart meta0 meta1: get services infos"
   command: "{{ openio_gridinit_cmd }} status @meta0 @meta1"
   ignore_errors: true
   failed_when: false
   changed_when: false
   register: m0m1_svcs
 
-- name: "Restart meta0 meta1: PIDs"
+- name: "Restart meta0 meta1: get services PIDs"
   shell: "echo '{{ m0m1_svcs.stdout }}' | awk '/ {{ openio_namespace }},/ {print $3}'"
   changed_when: false
   register: m0m1_pids
 
-- name: "Restart meta0 meta1: services names"
+- name: "Restart meta0 meta1: get services names"
   shell: "echo '{{ m0m1_svcs.stdout }}' | awk '/ {{ openio_namespace }},/ {print $1}'"
   changed_when: false
   register: m0m1_names
