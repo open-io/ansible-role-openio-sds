@@ -36,7 +36,6 @@
   register: m0m1_pids_killed
 
 - name: "Restart meta0 meta1: cleanup stray processes by force-killing"
-  changed_when: false
   # The proc file test is in case the process finally disappeared
   shell: "kill -9 {{ item.pid }} || [ ! -f /proc/{{ item.pid }}/status ]"
   when:
@@ -44,5 +43,6 @@
     - (item.state is defined and item.state != 'absent') or
       (item.msg is defined and item.msg[:7] == 'Timeout')
   with_items: "{{ m0m1_pids_killed.results }}"
+  changed_when: false
 
 ...
