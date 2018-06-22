@@ -4,18 +4,22 @@
   command: "{{ openio_gridinit_cmd }} status @meta0 @meta1"
   ignore_errors: true
   failed_when: false
+  changed_when: false
   register: m0m1_svcs
 
 - name: "Restart meta0 meta1: PIDs"
   shell: "echo '{{ m0m1_svcs.stdout }}' | awk '/ {{ openio_namespace }},/ {print $3}'"
+  changed_when: false
   register: m0m1_pids
 
 - name: "Restart meta0 meta1: services names"
   shell: "echo '{{ m0m1_svcs.stdout }}' | awk '/ {{ openio_namespace }},/ {print $1}'"
+  changed_when: false
   register: m0m1_names
 
 - name: "Restart meta0 meta1: restart services"
   command: "{{ openio_gridinit_cmd }} restart {{ m0m1_names.stdout }}"
+  changed_when: false
 
 - name: "Restart meta0 meta1: wait for processes to die"
   wait_for:
@@ -28,10 +32,11 @@
     loop_var: pid
   ignore_errors: true
   failed_when: false
+  changed_when: false
   register: m0m1_pids_killed
 
 - name: "Restart meta0 meta1: cleanup stray processes by force-killing"
-  changed_when: true
+  changed_when: false
   # The proc file test is in case the process finally disappeared
   shell: "kill -9 {{ item.pid }} || [ ! -f /proc/{{ item.pid }}/status ]"
   when:
