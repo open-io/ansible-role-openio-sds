@@ -40,6 +40,7 @@ openio_minimal_score_for_directory_bootstrap: 50
 openio_zookeeper_bootstrap_cmd: '/usr/bin/zk-bootstrap.py'
 openio_zookeeper_bootstrap_options: ''
 
+openio_zk_inventory_group_name: "openio_zk_cluster"
 openio_zk_cluster_ip:
   - '127.1.1.1'
   - '127.2.2.2'
