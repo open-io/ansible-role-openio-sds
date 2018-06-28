@@ -10,4 +10,9 @@
   apt:
     name: puppet-module-openio-openiosds
     update_cache: yes
+    
+- name: Install the package "netcat"
+  apt:
+    name: netcat
+    update_cache: yes
 ...
