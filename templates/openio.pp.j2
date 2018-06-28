@@ -7,7 +7,7 @@ openiosds::namespace {'{{ openio_namespace }}':
   eventagent_url => "beanstalk://{{ openio_network_private_ipaddress }}:6014",
   meta1_digits   => {{ openio_meta1_digits }},
   ns_storage_policy => '{{ openio_storage_policy }}',
-  ns_service_update_policy => {'meta2'=>'KEEP|3|1|','sqlx'=>'KEEP|3|1|','rdir'=>'KEEP|1|1|user_is_a_service=rawx'},
+  ns_service_update_policy => {{ openio_service_update_policy }},
   ns_chunk_size => "{{ openio_chunk_size }}",
 }
 openiosds::oioproxy {'oioproxy-1':
