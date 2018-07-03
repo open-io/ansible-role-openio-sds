@@ -56,6 +56,7 @@ openio_redis_cluster_ip:
   - '127.3.3.3'
 
 openio_bootstrap: false
+openio_timeout_bootstrap_meta_0_1: 600
 
 openio_sds_sysctl_managed: true
 openio_sds_sysctl_template_dest: /etc/sysctl.d/openio-sds.conf
