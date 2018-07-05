@@ -18,6 +18,7 @@ This role supports Centos 7 and Ubuntu 16.04 Xenial.
 | `openio_zk_cluster_ip`		| `['127.1.1.1', '127.2.2.2', '127.3.3.3']`	| List of IP addresses where to install the Zookeeper cluster (3 IPs min / 5 IPs max) |
 | `conscience_ip`	| `'127.1.1.1'`					| IP address where to put the conscience service |
 | `openio_redis_cluster_ip`		| `['127.1.1.1', '127.2.2.2', '127.3.3.3']`					| List of IP addresses of the Redis cluster |
+| `openio_memcache_farm_ip`             | `['127.1.1.1', '127.2.2.2', '127.3.3.3']`                                     | List of IP addresses of memcached farm
 | `openio_bootstrap`		| `false`					| Bootstrap the OpenIO namespace |
 | `openio_network_public_ipaddress`	| `'8.8.8.8'`	| local IP adress of the public oioswift API endpoint (if any) |
 | `openio_network_private_ipaddress`	| `'127.x.x.x'`	| local IP address for the private API endpoints of all other (than oioswift) services |
