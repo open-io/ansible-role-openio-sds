@@ -70,7 +70,7 @@
   when: inventory_hostname == groups['openio_conscience'][0]
 
 - name: "Wait for services's scores get to a sensible point"
-  command: "{{ openio_cli_path }} cluster wait -d 600 rawx rdir --oio-ns={{ openio_namespace }} -s {{ openio_minimal_score_for_volume_admin_bootstrap }}"
+  command: "{{ openio_cli_path }} cluster wait -d {{ openio_timeout_sensible_score }} rawx rdir --oio-ns={{ openio_namespace }} -s {{ openio_minimal_score_for_volume_admin_bootstrap }}"
   when: inventory_hostname == groups['openio_conscience'][0]
 
 - name: "Bootstrapping Reverse Directory for namespace {{ openio_namespace }}"
