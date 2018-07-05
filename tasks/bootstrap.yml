@@ -14,7 +14,9 @@
   register: openio_zk_status
   ignore_errors: true
   failed_when: false
-  when: inventory_hostname == groups[openio_zk_inventory_group_name][0]
+  when: 
+    - openio_zk_cluster_ip
+    - inventory_hostname == groups[openio_zk_inventory_group_name][0]
 
 - name: Wait for Zookeeper to be online
   shell: echo ruok | nc {{ item }} 6005
@@ -23,11 +25,14 @@
   retries: 10
   delay: 3
   with_items: "{{ openio_zk_cluster_ip }}"
-  when: inventory_hostname == groups[openio_zk_inventory_group_name][0]
+  when: 
+    - openio_zk_cluster_ip
+    - inventory_hostname == groups[openio_zk_inventory_group_name][0]
 
 - name: "Bootstrapping ZooKeeper for namespace {{ openio_namespace }}"
   command: "{{ openio_zookeeper_bootstrap_cmd }} {{ openio_namespace }} {{ openio_zookeeper_bootstrap_options }}"
   when:
+    - openio_zk_cluster_ip
     - inventory_hostname == groups[openio_zk_inventory_group_name][0]
     - openio_zk_status.rc != 0
   register: zk_bootstrap
@@ -40,12 +45,14 @@
 - name: "Bootstrapping ZooKeeper for namespace {{ openio_namespace }} in slow mode"
   command: "{{ openio_zookeeper_bootstrap_cmd }} {{ openio_namespace }} {{ openio_zookeeper_bootstrap_options }} --slow"
   when:
+    - openio_zk_cluster_ip
     - inventory_hostname == groups[openio_zk_inventory_group_name][0]
     - openio_zk_status.rc != 0
     - zk_bootstrap.rc != 0
 
 - name: 'Restart meta0 & meta1'
   include_tasks: restart_m0m1.yml
+  when: openio_zk_cluster_ip
 
 - name: "Unlock scores on meta0/meta1 services"
   command: "{{ openio_cli_path }} cluster unlockall meta0 meta1 --oio-ns={{ openio_namespace }}"

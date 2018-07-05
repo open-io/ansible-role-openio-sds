@@ -2,7 +2,9 @@ class {'openiosds':}
 openiosds::namespace {'{{ openio_namespace }}':
   ns             => '{{ openio_namespace }}',
   conscience_url => "{{ conscience_ip }}:6000",
+{% if openio_zk_cluster_ip -%}
   zookeeper_url  => "{% for ip in openio_zk_cluster_ip %}{{ ip }}:6005{% if not loop.last %},{% endif %}{% endfor %}",
+{% endif %}
   oioproxy_url   => "{{ openio_network_private_ipaddress }}:6006",
   eventagent_url => "beanstalk://{{ openio_network_private_ipaddress }}:6014",
   meta1_digits   => {{ openio_meta1_digits }},
