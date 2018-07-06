@@ -59,6 +59,9 @@ openio_bootstrap: false
 openio_timeout_bootstrap_meta_0_1: 600
 openio_timeout_sensible_score: 600
 
+openio_rawx_mpm: "{'worker'=>{'StartServers'=>1,'MinSpareThreads'=>32,'MaxSpareThreads'=>256,'ThreadsPerChild'=>256,'MaxRequestsPerChild'=>0,'ServerLimit'=>16}"
+openio_rdir_chunks_per_second: 2
+
 openio_sds_sysctl_managed: true
 openio_sds_sysctl_template_dest: /etc/sysctl.d/openio-sds.conf
 openio_sds_sysctl_entries:
