@@ -60,6 +60,10 @@
 
 - name: "Bootstrapping OpenIO namespace {{ openio_namespace }} with {{ openio_replicas }} replicas"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ openio_replicas }} --no-rdir"
+  register: dir_bootstrap
+  until: dir_bootstrap.rc == 0
+  retries: 3
+  delay: 5
   when: inventory_hostname == groups['openio_conscience'][0]
 
 - name: 'Restart meta0 & meta1'
