@@ -24,7 +24,7 @@ openiosds::conscienceagent {'conscienceagent-1':
 openiosds::oioeventagent {'oio-event-agent-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
-  {%- if openio_oioeventagent_workers %}
+  {%- if openio_oioeventagent_workers is defined %}
   workers => {{ openio_oioeventagent_workers }},
   {%- endif %}
 }
