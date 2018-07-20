@@ -32,7 +32,7 @@ openio_puppet4_apply: 'puppet apply --modulepath=/usr/share/puppet/modules/'
 openio_cli_path: 'openio'
 
 openio_namespace: 'OPENIO'
-openio_chunk_size: '10485760'
+openio_chunk_size: '104857600'
 
 openio_replicas: 3
 
