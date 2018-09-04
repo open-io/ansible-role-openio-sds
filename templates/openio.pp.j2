@@ -58,16 +58,24 @@ openiosds::meta1 {'meta1-{{ loop.index }}':
   volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta1-{{ loop.index }}",
 }
   {%- endif %}
-  {%- if 'openio_directory_m2' in group_names %}
 
-openiosds::meta2 {'meta2-{{ loop.index }}':
-  num       => {{ loop.index }},
-  ns        => '{{ openio_namespace }}',
-  ipaddress => "{{ openio_network_private_ipaddress }}",
-  port      => {{ 6120 + loop.index }},
-  volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta2-{{ loop.index }}",
+  {%- if 'openio_directory_m2' in group_names %}
+  {%    set partition_index = loop.index0 %}
+  {%    set process_per_partition = partition.meta2_count | default(1) %}
+  {%-   for service_id_per_partition in range(process_per_partition) %}
+  {%-     set service_id_total = service_id_per_partition + process_per_partition * partition_index + 1 %}
+
+openiosds::meta2 {'meta2-{{ service_id_total }}':
+num       => {{ service_id_total }},
+ns        => '{{ openio_namespace }}',
+ipaddress => "{{ openio_network_private_ipaddress }}",
+port      => {{ 6120 + service_id_total }},
+volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta2-{{ service_id_total }}",
 }
+
+  {%-   endfor %}
   {%- endif %}
+
   {%- if 'openio_zk_cluster' in group_names and loop.index == 1 %}
 
 ###  ZooKeeper
