@@ -24,9 +24,12 @@ openiosds::conscienceagent {'conscienceagent-1':
 openiosds::oioeventagent {'oio-event-agent-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
-  {%- if openio_oioeventagent_workers is defined %}
+  {% if openio_oioeventagent_workers is defined -%}
   workers => {{ openio_oioeventagent_workers }},
-  {%- endif %}
+  {% endif -%}
+  {% if openio_oioeventagent_webhooks is defined -%}
+  webhooks => {{ openio_oioeventagent_webhooks }},
+  {% endif -%}
 }
 {# Loop over openio_metadata_mounts for metadata services #}
 {% for partition in openio_metadata_mounts %}
