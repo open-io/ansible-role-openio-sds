@@ -21,9 +21,6 @@ openio_data_mounts:
 openio_metadata_mounts:
   - { mountpoint: "/var/lib/oio/sds" }
 
-openio_rawx_accurate_location: false
-
-#openio_puppet_manifest: '/etc/oio/sds'
 openio_puppet_manifest: '/root'
 
 openio_puppet3_apply: 'puppet apply --no-stringify_facts'
@@ -35,6 +32,9 @@ openio_namespace: 'OPENIO'
 openio_chunk_size: '104857600'
 
 openio_replicas: 3
+
+# this `.{}` will be filled by `format_location()`
+openio_location: "{{ ansible_hostname }}.{}"
 
 openio_minimal_score_for_volume_admin_bootstrap: 50
 openio_minimal_score_for_directory_bootstrap: 50

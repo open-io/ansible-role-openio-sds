@@ -52,6 +52,7 @@ openiosds::meta0 {'meta0-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
   volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta0-1",
+  location  => "{{ openio_location | format_location(count=1) }}",
 }
   {%- endif %}
   {%- if 'openio_directory_m1' in group_names %}
@@ -62,6 +63,7 @@ openiosds::meta1 {'meta1-{{ loop.index }}':
   ipaddress => "{{ openio_network_private_ipaddress }}",
   port      => {{ 6110 + loop.index }},
   volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta1-{{ loop.index }}",
+  location  => "{{ openio_location | format_location(count=loop.index) }}",
 }
   {%- endif %}
 
@@ -77,6 +79,7 @@ ns        => '{{ openio_namespace }}',
 ipaddress => "{{ openio_network_private_ipaddress }}",
 port      => {{ 6120 + service_id_total }},
 volume    => "{{ partition.mountpoint }}/{{ openio_namespace }}/meta2-{{ service_id_total }}",
+location  => "{{ openio_location | format_location(count=service_id_total) }}",
 }
 
   {%-   endfor %}
@@ -102,6 +105,7 @@ openiosds::account {'account-1':
   ipaddress            => "{{ openio_network_private_ipaddress }}",
   sentinel_hosts       => '{% for ip  in openio_redis_cluster_ip %}{{ ip }}:6012{% if not loop.last %},{% endif %}{% endfor %}',
   sentinel_master_name => '{{ openio_namespace }}-master-1',
+  location  => "{{ openio_location | format_location(count=1) }}",
 }
   {%- endif %}
   {%- if 'openio_redis_cluster' in group_names and loop.index == 1 %}
@@ -141,9 +145,7 @@ openiosds::rawx {'rawx-{{ loop.index }}':
   port         => {{ 6200 + loop.index }},
   documentRoot => "{{ partition.mountpoint }}/{{ openio_namespace }}/rawx-{{ loop.index }}",
   httpd_mpm    => {{ openio_rawx_mpm }},
-  {%- if openio_rawx_accurate_location %}
-  location  => "${hostname}.{{ loop.index }}",
-  {%- endif %}
+  location  => "{{ openio_location | format_location(count=loop.index) }}",
 }
 openiosds::rdir {'rdir-{{ loop.index }}':
   num       => {{ loop.index }},
@@ -151,6 +153,7 @@ openiosds::rdir {'rdir-{{ loop.index }}':
   ipaddress => "{{ openio_network_private_ipaddress }}",
   port      => {{ 6300 + loop.index }},
   db_path   => "{{ partition.mountpoint }}/{{ openio_namespace }}/rdir-{{ loop.index }}",
+  location  => "{{ openio_location | format_location(count=loop.index) }}",
 }
 openiosds::oioblobindexer {'oio-blob-indexer-rawx-{{ loop.index }}':
   num    => {{ loop.index }},
