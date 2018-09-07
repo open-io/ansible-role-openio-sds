@@ -11,6 +11,9 @@ openiosds::namespace {'{{ openio_namespace }}':
   ns_storage_policy => '{{ openio_storage_policy }}',
   ns_service_update_policy => {{ openio_service_update_policy }},
   ns_chunk_size => "{{ openio_chunk_size }}",
+{%- if openio_ecd_url is defined %}
+  ecd_url => "{{ openio_ecd_url }}",
+{%- endif %}
 }
 openiosds::oioproxy {'oioproxy-1':
   num       => 1,
