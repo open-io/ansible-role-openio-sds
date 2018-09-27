@@ -145,6 +145,10 @@ openiosds::rawx {'rawx-{{ loop.index }}':
   port         => {{ 6200 + loop.index }},
   documentRoot => "{{ partition.mountpoint }}/{{ openio_namespace }}/rawx-{{ loop.index }}",
   httpd_mpm    => {{ openio_rawx_mpm }},
+  {%- if openio_rawx_golang_version is defined %}
+
+  golang_version => '{{ openio_rawx_golang_version }}',
+  {%- endif %}
   location  => "{{ openio_location | format_location(count=loop.index) }}",
 }
 openiosds::rdir {'rdir-{{ loop.index }}':
