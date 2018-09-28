@@ -147,7 +147,7 @@ openiosds::rawx {'rawx-{{ loop.index }}':
   httpd_mpm    => {{ openio_rawx_mpm }},
   {%- if openio_rawx_golang_version is defined %}
 
-  golang_version => {{ openio_rawx_golang_version }},
+  golang_version => {{ openio_rawx_golang_version | lower}},
   {% endif %}
   location  => "{{ openio_location | format_location(count=loop.index) }}",
 }
