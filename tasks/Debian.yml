@@ -6,6 +6,12 @@
     default_release: "{{ ansible_distribution_release }}"
     update_cache: yes
 
+- name: Adding user openio
+  user:
+    name: openio
+    groups: syslog
+    append: yes
+
 - name: "Install OpenIO puppet module"
   apt:
     name: puppet-module-openio-openiosds
