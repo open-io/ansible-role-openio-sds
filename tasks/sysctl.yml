@@ -9,7 +9,8 @@
     reload: yes
   tags: install
   with_dict: "{{ openio_sds_sysctl_entries }}"
-  when: openio_sds_sysctl_managed
-        and ansible_virtualization_type != 'docker'
+  when:
+    - openio_sds_sysctl_managed
+    - ansible_virtualization_type != 'docker'
   failed_when: false
 ...
