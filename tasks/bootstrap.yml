@@ -39,6 +39,7 @@
 
     - name: 'Restart meta0 & meta1'
       include_tasks: restart_m0m1.yml
+      when: inventory_hostname in (groups[openio_directory_m0] + groups[openio_directory_m1])
   when: openio_zk_cluster_ip
 
 - name: "Unlock scores on meta0/meta1 services"
@@ -59,6 +60,7 @@
 
 - name: 'Restart meta0 & meta1'
   include_tasks: restart_m0m1.yml
+  when: inventory_hostname in (groups[openio_directory_m0] + groups[openio_directory_m1])
 
 - name: "Starting services for namespace {{ openio_namespace }}"
   command: "{{ openio_gridinit_cmd }} start @{{ openio_namespace }}"
