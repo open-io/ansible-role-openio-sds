@@ -55,7 +55,7 @@ openio_redis_cluster_ip:
   - '127.2.2.2'
   - '127.3.3.3'
 
-openio_bootstrap: false
+openio_provision_only: false
 openio_timeout_bootstrap_meta_0_1: 600
 openio_timeout_sensible_score: 600
 

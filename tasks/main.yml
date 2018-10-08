@@ -24,6 +24,7 @@
     owner: root
     group: root
     mode: 0644
+    backup: true
 
 - include: "{{ item }}"
   tags:
@@ -41,9 +42,12 @@
     mode: 0751
   with_items: "{{ openio_data_mounts }} + {{ openio_metadata_mounts }}"
 
-- name: "Bootstrapping OpenIO for namespace {{ openio_namespace }}"
+- name: Provision with puppet
+  include: provision.yml
+
+- name: Bootstrap namespace
   tags:
-    - openio_bootstrap
+    - bootstrap
   include: bootstrap.yml
-  when: openio_bootstrap
+  when: not openio_provision_only
 ...
