@@ -1,17 +1,15 @@
 ---
-- name: Provision
-  block:
-  - name: "Adapting to Puppet version"
-    shell: "puppet --version|cut -c1"
-    register: puppet_majorversion
+- name: "Adapting to Puppet version"
+  shell: "puppet --version|cut -c1"
+  register: puppet_majorversion
 
-  - name: "Applying Puppet manifest for namespace {{ openio_namespace }}"
-    command: "{{ openio_puppet4_apply if ( puppet_majorversion.stdout in ['4','5']) else openio_puppet3_apply }} {% if openio_sds_puppet_apply_options is defined %}{{ openio_sds_puppet_apply_options }}{% endif %} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
-    register: puppet_result
-    changed_when: puppet_result.rc == 2
+- name: "Applying Puppet manifest for namespace {{ openio_namespace }}"
+  command: "{{ openio_puppet4_apply if ( puppet_majorversion.stdout in ['4','5']) else openio_puppet3_apply }} {% if openio_sds_puppet_apply_options is defined %}{{ openio_sds_puppet_apply_options }}{% endif %} {{ openio_puppet_manifest }}/{{ openio_namespace|lower }}.pp"
+  register: puppet_result
+  changed_when: puppet_result.rc == 2
 
-  - name: Install openio-tools
-    package:
-      name: openio-sds-tools
-    when: ansible_os_family == 'RedHat'
+- name: Install openio-tools
+  package:
+    name: openio-sds-tools
+  when: ansible_os_family == 'RedHat'
 ...
