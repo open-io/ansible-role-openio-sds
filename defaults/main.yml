@@ -36,8 +36,8 @@ openio_replicas: 3
 # this `.{}` will be filled by `format_location()`
 openio_location: "{{ ansible_hostname }}.{}"
 
-openio_minimal_score_for_volume_admin_bootstrap: 50
-openio_minimal_score_for_directory_bootstrap: 50
+openio_minimal_score_for_volume_admin_bootstrap: 10
+openio_minimal_score_for_directory_bootstrap: 10
 
 openio_zookeeper_bootstrap_cmd: '/usr/bin/zk-bootstrap.py'
 openio_zookeeper_bootstrap_options: ''
