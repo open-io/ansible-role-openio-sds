@@ -74,4 +74,6 @@ openio_sds_sysctl_entries:
   net.ipv4.tcp_timestamps: 1
   net.ipv4.tcp_tw_reuse: 1
   net.ipv4.tcp_window_scaling: 1
+
+openio_conscience_groupname: "openio_conscience"
 ...
