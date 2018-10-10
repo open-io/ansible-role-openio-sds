@@ -20,10 +20,14 @@ openiosds::oioproxy {'oioproxy-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
 }
+
+{%- if 'conscience_agent' not in group_names %}
 openiosds::conscienceagent {'conscienceagent-1':
   num => 1,
   ns  => '{{ openio_namespace }}',
 }
+{% endif %}
+
 openiosds::oioeventagent {'oio-event-agent-1':
   ns        => '{{ openio_namespace }}',
   ipaddress => "{{ openio_network_private_ipaddress }}",
