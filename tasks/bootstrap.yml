@@ -44,11 +44,11 @@
 
 - name: "Unlock scores on meta0/meta1 services"
   command: "{{ openio_cli_path }} cluster unlockall meta0 meta1 --oio-ns={{ openio_namespace }}"
-  when: inventory_hostname == groups['openio_conscience'][0]
+  when: inventory_hostname == groups[openio_conscience_groupname][0]
 
 - name: "Wait for meta0/meta1 services"
   command: "{{ openio_cli_path }} cluster wait -d {{ openio_timeout_bootstrap_meta_0_1 }} meta0 meta1 --oio-ns={{ openio_namespace }} -s {{ openio_minimal_score_for_directory_bootstrap }}"
-  when: inventory_hostname == groups['openio_conscience'][0]
+  when: inventory_hostname == groups[openio_conscience_groupname][0]
 
 - name: "Bootstrapping OpenIO namespace {{ openio_namespace }} with {{ openio_replicas }} replicas"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} directory bootstrap --replicas {{ openio_replicas }} --no-rdir"
@@ -56,7 +56,7 @@
   until: dir_bootstrap.rc == 0
   retries: 3
   delay: 5
-  when: inventory_hostname == groups['openio_conscience'][0]
+  when: inventory_hostname == groups[openio_conscience_groupname][0]
 
 - name: 'Restart meta0 & meta1'
   include_tasks: restart_m0m1.yml
@@ -67,14 +67,14 @@
 
 - name: "Unlock scores"
   command: "{{ openio_cli_path }} cluster unlockall --oio-ns={{ openio_namespace }}"
-  when: inventory_hostname == groups['openio_conscience'][0]
+  when: inventory_hostname == groups[openio_conscience_groupname][0]
 
 - name: "Wait for services's scores get to a sensible point"
   command: "{{ openio_cli_path }} cluster wait -d {{ openio_timeout_sensible_score }} rawx rdir --oio-ns={{ openio_namespace }} -s {{ openio_minimal_score_for_volume_admin_bootstrap }}"
-  when: inventory_hostname == groups['openio_conscience'][0]
+  when: inventory_hostname == groups[openio_conscience_groupname][0]
 
 - name: "Bootstrapping Reverse Directory for namespace {{ openio_namespace }}"
   command: "{{ openio_cli_path }} --oio-ns={{ openio_namespace }} volume admin bootstrap"
-  when: inventory_hostname == groups['openio_conscience'][0]
+  when: inventory_hostname == groups[openio_conscience_groupname][0]
 
 ...
