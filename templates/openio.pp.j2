@@ -11,7 +11,7 @@ openiosds::namespace {'{{ openio_namespace }}':
   ns_storage_policy => '{{ openio_storage_policy }}',
   ns_service_update_policy => {{ openio_service_update_policy }},
   ns_chunk_size => "{{ openio_chunk_size }}",
-{%- if openio_ecd_url is defined %}
+{%- if openio_ecd_url is defined and openio_ecd_url %}
   ecd_url => "{{ openio_ecd_url }}",
 {%- endif %}
 }
