@@ -65,7 +65,7 @@ openio_rdir_chunks_per_second: 2
 openio_sds_sysctl_managed: true
 openio_sds_sysctl_template_dest: /etc/sysctl.d/openio-sds.conf
 openio_sds_sysctl_entries:
-  net.ipv4.ip_local_port_range: 1024 65535
+  net.ipv4.ip_local_port_range: 8192 65535
   net.ipv4.tcp_fastopen: 1
   net.ipv4.tcp_mtu_probing: 1
   net.ipv4.tcp_rfc1337: 1
