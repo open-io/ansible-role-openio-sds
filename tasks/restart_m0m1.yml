@@ -32,7 +32,7 @@
   wait_for:
     path: "/proc/{{ pid }}/status"
     state: absent
-    timeout: 30
+    timeout: 35
   when:
     - m0m1_svcs.stdout != ""
     - (pid | int) != -1
