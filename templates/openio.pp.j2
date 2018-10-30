@@ -1,4 +1,7 @@
-class {'openiosds':}
+class {'openiosds':
+uid     => '{{ openio_user_openio_uid }}',
+gid     => '{{ openio_group_openio_gid }}',
+}
 openiosds::namespace {'{{ openio_namespace }}':
   ns             => '{{ openio_namespace }}',
   conscience_url => "{{ conscience_ip }}:6000",
