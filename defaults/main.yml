@@ -26,6 +26,9 @@ openio_puppet_manifest: '/root'
 openio_puppet3_apply: 'puppet apply --no-stringify_facts'
 openio_puppet4_apply: 'puppet apply --modulepath=/usr/share/puppet/modules/'
 
+openio_user_openio_uid: 120
+openio_group_openio_gid: 220
+
 openio_cli_path: 'openio'
 
 openio_namespace: 'OPENIO'
