@@ -35,6 +35,7 @@ openio_namespace: 'OPENIO'
 openio_chunk_size: '104857600'
 
 openio_replicas: 3
+openio_replication_queue_url: ""
 
 # this `.{}` will be filled by `format_location()`
 openio_location: "{{ ansible_hostname }}.{}"
