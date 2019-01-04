@@ -40,7 +40,7 @@ openiosds::oioeventagent {'oio-event-agent-1':
   {% if openio_oioeventagent_webhooks is defined -%}
   webhooks => {{ openio_oioeventagent_webhooks }},
   {% endif -%}
-  {% if openio_replication_queue_url -%}
+  {% if openio_replicator == 1 -%}
   replication => true,
   replication_queue_url => "{{ openio_replication_queue_url }}",
   {% endif %}
